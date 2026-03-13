@@ -1,0 +1,24 @@
+{
+  "name": "Adhan Bouna Pro - Kherrachi Sami",
+  "short_name": "Adhan Bouna",
+  "description": "تطبيق مواقيت الصلاة في عنابة والجزائر - تصميم خراشي سامي",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#004d40",
+  "theme_color": "#004d40",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/ios-filled/192/bf953f/letter-k.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://img.icons8.com/ios-filled/512/bf953f/letter-k.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
