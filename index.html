@@ -2,486 +2,103 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
-    <title>أذان بونة Pro - الإصدار المتكامل</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Cairo:wght@400;700&family=Amiri:ital@0;1&display=swap" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>أذان بونة Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Amiri&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --teal-deep: #004d40; 
-            --main-teal: #00695c; 
-            --accent-gold: #ffcf33;
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --night-glass: rgba(15, 32, 39, 0.85);
-            --metallic-gold: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-        }
-
-        body, html { 
-            margin: 0; padding: 0; height: 100dvh; overflow: hidden; 
-            font-family: 'Cairo', sans-serif; background-color: #000; color: white; 
-        }
-
-        @media screen and (orientation: landscape) {
-            body.force-portrait {
-                transform: rotate(-90deg); transform-origin: center center;
-                width: 100vh; height: 100vw; position: absolute;
-                top: 50%; left: 50%; margin-left: -50vh; margin-top: -50vw;
-            }
-        }
-
-        #dynamic-bg { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            z-index: -1; background-size: cover; background-position: center; 
-            transition: background-image 2s ease-in-out; filter: brightness(0.3); 
-        }
-                
-        .app-container { 
-            width: 100%; height: 100%; display: flex; flex-direction: column; 
-            background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); 
-            -webkit-backdrop-filter: blur(8px); transition: opacity 0.5s ease; 
-        }
-        body.signage-mode .app-container { display: none; }
-                        
-        header { padding: 10px; position: relative; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); }
-        .settings-btn { position: absolute; top: 10px; left: 10px; font-size: 1.1rem; cursor: pointer; z-index: 10; background: rgba(0,0,0,0.5); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--accent-gold);}
-        .weather-info { position: absolute; top: 10px; right: 10px; font-size: 0.8rem; text-align: right; color: var(--accent-gold); }
-        .live-clock { font-size: 2.4rem; font-weight: bold; font-family: 'Playfair Display', serif; margin-top: 2px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);}
-        .next-prayer-info { color: var(--accent-gold); font-size: 0.9rem; margin-top: 2px; font-weight: bold;}
-                                        
-        .content-scroll { flex: 1; overflow-y: auto; padding: 5px 12px; padding-bottom: 50px; }
-                
-        .prayer-card { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; margin-bottom: 5px; border-radius: 10px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; position: relative;}
-        .prayer-card.active { background: var(--main-teal); border-color: var(--accent-gold); transform: scale(1.01); box-shadow: 0 3px 8px rgba(0,105,92,0.5);}
-        .prayer-card.passed { opacity: 0.4; filter: grayscale(50%); } 
-        .p-details { display: flex; flex-direction: column; align-items: flex-start;}
-        .p-name { font-size: 0.95rem; font-weight: bold; }
-        .p-iqamah-text { font-size: 0.65rem; color: #ccc; }
-        .p-time { font-size: 1.15rem; font-weight: bold; font-family: 'Playfair Display', serif; color: var(--accent-gold);}
-
-        .iq-countdown { position: absolute; top: -5px; left: -5px; background: #d32f2f; color: white; padding: 2px 5px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; display: none; animation: pulse 1s infinite;}
-        .prayer-card.waiting-iqamah .iq-countdown { display: block; }
-                                                                                
-        .btn-activate { width: 100%; padding: 8px; border-radius: 8px; border: none; background: var(--accent-gold); color: #000; font-weight: bold; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 10px rgba(255,207,51,0.4); margin-bottom: 8px;}
-
-        .hadith-ticker { background: rgba(0, 0, 0, 0.8); padding: 8px 0; font-family: 'Amiri', serif; font-size: 1rem; border-top: 1px solid var(--accent-gold); white-space: nowrap; overflow: hidden; position: absolute; bottom: 0; width: 100%; }
-        .hadith-ticker span { display: inline-block; padding-right: 100%; animation: ticker-ltr 30s linear infinite; direction: rtl;}
-        @keyframes ticker-ltr { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-                        
-        #signage-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 50; display: none; grid-template-rows: 15% 55% 20% 10%; padding: 20px; box-sizing: border-box; }
-        body.signage-mode #signage-layer { display: grid; }
-        .sig-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent-gold); padding-bottom: 10px;}
-        .sig-weather, .sig-greg { font-size: 1.1rem; color: #ccc; }
-        .sig-hijri { color: var(--accent-gold); font-size: 1.3rem; font-weight: bold;}
-        .sig-clock { font-size: 4rem; font-weight: bold; font-family: 'Playfair Display', serif; }
-        .sig-center { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative;}
-        .sig-verse { font-size: 2.2rem; font-weight: 700; color: white; line-height: 1.6; max-width: 80%; font-family: 'Amiri', serif;}
-                                                                                
-        .sig-prayers { display: flex; justify-content: space-between; gap: 8px; }
-        .sig-p-card { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 6px; border: 1px solid rgba(255,255,255,0.2); position: relative;}
-        .sig-p-card.active { background: var(--metallic-gold); color: #000; transform: scale(1.02); box-shadow: 0 0 15px rgba(255,207,51,0.5); border: 2px solid #fff;}
-        .sig-p-card.passed { opacity: 0.4; filter: grayscale(50%); }
-        .sig-p-card.waiting-iqamah .iq-countdown { display: block; }
-        .sig-p-name { font-size: 1.1rem; font-weight: bold;}
-        .sig-p-time { font-size: 1.6rem; font-weight: bold; font-family: 'Playfair Display', serif;}
-        .sig-iqamah { font-size: 0.8rem; margin-top: 3px; color: #ccc;}
-                                                                                
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--night-glass); backdrop-filter: blur(12px); display: none; justify-content: center; align-items: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
-        .modal.show { display: flex; opacity: 1; }
-        .modal-content { width: 95%; max-width: 400px; background: rgba(20, 20, 20, 0.95); border: 1px solid var(--accent-gold); border-radius: 15px; padding: 20px; max-height: 90vh; overflow-y: auto; }
-                                                
-        .settings-section { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; margin-bottom: 12px; }
-        .settings-title { color: var(--accent-gold); font-weight: bold; margin-bottom: 12px; font-size: 1rem;}
-        .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.9rem;}
-                                
-        .switch { position: relative; display: inline-block; width: 36px; height: 18px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.2); transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--accent-gold); }
-        input:checked + .slider:before { transform: translateX(18px); }
-                                                
-        .num-input { width: 50px; background: rgba(0,0,0,0.5); border: 1px solid #555; color: white; padding: 4px; border-radius: 6px; text-align: center; }
-        .text-input { width: 140px; background: rgba(0,0,0,0.5); border: 1px solid #555; color: white; padding: 5px; border-radius: 6px; text-align: right; font-family: 'Cairo', sans-serif;}
-                
-        .adhkar-modal { position: fixed; bottom: -100%; left: 0; width: 100%; background: #1a1a1a; color: #fff; border-top: 2px solid var(--accent-gold); border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 25px; box-sizing: border-box; transition: bottom 0.5s ease-in-out; z-index: 2000; box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
-        .adhkar-modal.show { bottom: 0; }
-        .adhkar-title { color: var(--accent-gold); font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px;}
-        .adhkar-content { max-height: 40vh; overflow-y: auto; font-family: 'Amiri', serif; font-size: 1.2rem; line-height: 1.8; text-align: center; padding: 10px;}
-        .btn-close-adhkar { background: #d32f2f; color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; margin-top: 15px; font-weight: bold; cursor: pointer;}
-                                                
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        :root { --main-teal: #00695c; --accent-gold: #ffcf33; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Cairo', sans-serif; background: #000; color: white; }
+        #dynamic-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-size: cover; background-position: center; filter: brightness(0.3); transition: 2s; }
+        .app-container { height: 100%; display: flex; flex-direction: column; backdrop-filter: blur(8px); }
+        header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .live-clock { font-size: 3rem; font-weight: bold; color: white; margin: 10px 0; }
+        .prayer-card { display: flex; justify-content: space-between; padding: 15px; margin: 10px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .prayer-card.active { border-color: var(--accent-gold); background: var(--main-teal); }
+        .hadith-ticker { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.8); padding: 10px; overflow: hidden; white-space: nowrap; border-top: 1px solid var(--accent-gold); }
+        .hadith-ticker span { display: inline-block; animation: ticker 20s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        .error-msg { color: #ff5252; font-size: 0.8rem; }
     </style>
 </head>
 <body>
-            
     <div id="dynamic-bg"></div>
-    
-    <main class="app-container" id="main-app">
+    <div class="app-container">
         <header>
-            <div class="settings-btn" onclick="document.getElementById('settings-modal').classList.add('show')">⚙️</div>
-            <div class="weather-info">
-                <div id="w-temp">--°C 🌤️</div>
-                <div id="loc-name"> </div>
-            </div>
-            <div style="font-size: 0.9rem; color: #eee;" id="hijri-date">-- -- --</div>
+            <div id="loc-name">مسجد النور - عنابة</div>
             <div class="live-clock" id="liveClock">00:00:00</div>
-            <div class="next-prayer-info">الصلاة القادمة بعد: <span id="timer">--:--:--</span></div>
+            <div id="hijri-date" style="color: var(--accent-gold);">جارٍ التحميل...</div>
         </header>
-                                                                                                                            
-        <div class="content-scroll">
-            <button class="btn-activate" id="p-btn" onclick="activateSounds()">🔔 تفعيل الصوتيات والإشعارات</button>
-            <section id="prayer-list-phone"></section>
-        </div>
-                                        
-        <div class="hadith-ticker">
-            <span id="hadith-text">جارٍ تحميل أحاديث اليوم...</span>
-        </div>
-    </main>
-                                
-    <div id="signage-layer">
-        <div class="sig-header">
-            <div><div class="sig-weather" id="sig-temp">--°C 🌤️ <span id="sig-loc-name"> </span></div></div>
-            <div class="sig-clock" id="sig-clock">00:00</div>
-            <div style="text-align: right;">
-                <div class="sig-hijri" id="sig-hijri">-- -- --</div>
-                <div class="sig-greg" id="sig-greg">-- -- --</div>
-            </div>
-        </div>
-                                                                                                                                
-        <div class="sig-center">
-            <div class="sig-verse" id="sig-verse">"إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوقُوتًا"</div>
-            <div style="position: absolute; bottom: 10px; color:var(--accent-gold); font-size:1.1rem;" id="sig-timer">الوقت المتبقي: --:--:--</div>
-        </div>
-                                        
-        <div class="sig-prayers" id="prayer-list-sig"></div>
-        
-        <div style="display:flex; justify-content:center; align-items:center; border-top:1px solid rgba(255,255,255,0.2); padding-top:10px;">
-            <div style="font-size:1.3rem; color:var(--accent-gold); font-family:'Amiri', serif;">"أقرب ما يكون العبد من ربه وهو ساجد فأكثروا الدعاء"</div>
-        </div>
+        <div id="prayer-list" style="flex:1; overflow-y:auto; padding:10px;"></div>
+        <div class="hadith-ticker"><span id="hadith-text">جارٍ تحميل أحاديث اليوم...</span></div>
     </div>
-                                
-    <div class="modal" id="settings-modal">
-        <div class="modal-content">
-            <h3 style="color:var(--accent-gold); margin-top:0; text-align:center;">إعدادات أذان بونة Pro 🛠️</h3>
-            
-            <div class="settings-section">
-                <div class="settings-title">🕌 إعدادات المسجد والعرض</div>
-                <div class="setting-row"><span>اسم المسجد</span><input type="text" id="set-mosque" class="text-input" placeholder="مسجد النور"></div>
-                <div class="setting-row"><span>وضع الشاشة الكبيرة</span><label class="switch"><input type="checkbox" id="set-signage"><span class="slider"></span></label></div>
-                <div class="setting-row"><span>فرض العرض العمودي</span><label class="switch"><input type="checkbox" id="set-portrait"><span class="slider"></span></label></div>
-            </div>
-            
-            <div class="settings-section">
-                <div class="settings-title">📍 الموقع الجغرافي</div>
-                <div class="setting-row"><span>المدينة (انجليزي)</span><input type="text" id="set-city" class="text-input" placeholder="Annaba"></div>
-                <div class="setting-row"><span>البلد (انجليزي)</span><input type="text" id="set-country" class="text-input" placeholder="Algeria"></div>
-            </div>
-                                                                                                                
-            <div class="settings-section">
-                <div class="settings-title">⚙️ ضبط الأوقات المتقدم</div>
-                <div class="setting-row"><span>تعديل الساعة (بالدقائق)</span><input type="number" id="set-clock-offset" class="num-input" value="0"></div>
-                <div id="iqamah-settings-list" style="margin-top:10px;"></div>
-            </div>
-
-            <button onclick="saveAndCloseSettings()" style="width:100%; padding:10px; background:var(--main-teal); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">حفظ الإعدادات والتحديث</button>
-        </div>
-    </div>
-
-    <div class="adhkar-modal" id="adhkar-box">
-        <div class="adhkar-title" id="adhkar-title">أذكار الصلاة</div>
-        <div class="adhkar-content" id="adhkar-text">جارٍ التحميل...</div>
-        <button class="btn-close-adhkar" onclick="closeAdhkar()">إغلاق</button>
-    </div>
-
-    <audio id="a-adhan" src="https://www.islamcan.com/audio/adhan/azan2.mp3"></audio>
-    <audio id="a-iqamah" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
 
     <script>
-        const dailyHadiths = [
-            "«مَنْ صَلَّى الْبَرْدَيْنِ دَخَلَ الْجَنَّةَ» (البخاري ومسلم)",
-            "«رَكْعَتَا الْفَجْرِ خَيْرٌ مِنَ الدُّنْيَا وَمَا فِيهَا» (رواه مسلم)",
-            "«أَحَبُّ الأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ» (متفق عليه)"
-        ];
-
-        const backgrounds = [
-            'https://images.unsplash.com/photo-1590076214041-949479b12275?q=80&w=1920',
-            'https://images.unsplash.com/photo-1564121211835-e88c852648ab?q=80&w=1920',
-            'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=1920'
-        ];
-
-        const prayersData = [
-            {id:"Fajr", name:"الفجر"},
-            {id:"Dhuhr", name:"الظهر"},
-            {id:"Asr", name:"العصر"},
-            {id:"Maghrib", name:"المغرب"},
-            {id:"Isha", name:"العشاء"}
-        ];
-
+        // 1. البيانات الأساسية
+        const dailyHadiths = ["«مَنْ صَلَّى الْبَرْدَيْنِ دَخَلَ الْجَنَّةَ»", "«رَكْعَتَا الْفَجْرِ خَيْرٌ مِنَ الدُّنْيَا وَمَا فِيهَا»", "«أَحَبُّ الأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ»"];
+        const prayersData = [{id:"Fajr", name:"الفجر"}, {id:"Dhuhr", name:"الظهر"}, {id:"Asr", name:"العصر"}, {id:"Maghrib", name:"المغرب"}, {id:"Isha", name:"العشاء"}];
         let pTimes = {};
-        let soundsActivated = false;
-        let triggeredAlerts = new Set();
-        let bgIndex = 0;
-        let currentSettings = {
-            mosqueName: 'مسجد النور', city: 'Annaba', country: 'Algeria', 
-            signageMode: false, forcePortrait: false, clockOffset: 0,
-            iqamah: { Fajr: "20", Dhuhr: "15", Asr: "15", Maghrib: "5", Isha: "15" } 
-        };
 
-        // دالة التشغيل القوي والمباشر
-        function initApp() {
-            console.log("App Initialization Started...");
-            setDailyHadith();
-            loadSettings();
-            
-            fetchTimings().then(() => {
-                console.log("Timings Loaded Successfully");
-                setInterval(coreLogic, 1000); 
-                coreLogic(); 
-            }).catch(err => {
-                console.error("Critical Error Loading Timings:", err);
-                setInterval(coreLogic, 1000); // تشغيل الساعة حتى لو فشل الـ API
-            });
-
-            changeBackground();
-            setInterval(changeBackground, 60000);
-            setInterval(fetchTimings, 3600000); 
+        // 2. محرك التشغيل الرئيسي (معدل ليعمل فوراً)
+        function init() {
+            updateClock(); 
+            setInterval(updateClock, 1000); // تشغيل الساعة فوراً
+            setHadith();
+            fetchData();
+            setInterval(fetchData, 3600000); // تحديث البيانات كل ساعة
         }
 
-        // تشغيل فوري وبمجرد تحميل الـ DOM
-        document.addEventListener('DOMContentLoaded', initApp);
-        window.onload = function() { if(!pTimes.Fajr) initApp(); };
-
-        function setDailyHadith() {
-            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-            document.getElementById('hadith-text').innerText = dailyHadiths[dayOfYear % dailyHadiths.length];
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-GB');
+            if(pTimes.Fajr) checkActivePrayer(now);
         }
 
-        function loadSettings() {
-            const stored = localStorage.getItem('bouna_pro_v5');
-            if(stored) currentSettings = JSON.parse(stored);
-            
-            document.getElementById('set-mosque').value = currentSettings.mosqueName;
-            document.getElementById('set-city').value = currentSettings.city;
-            document.getElementById('set-country').value = currentSettings.country;
-            document.getElementById('set-signage').checked = currentSettings.signageMode;
-            document.getElementById('set-portrait').checked = currentSettings.forcePortrait;
-            document.getElementById('set-clock-offset').value = currentSettings.clockOffset;
-            
-            document.getElementById('loc-name').innerText = currentSettings.mosqueName;
-            if(document.getElementById('sig-loc-name')) {
-                document.getElementById('sig-loc-name').innerText = currentSettings.mosqueName;
-            }
-            
-            const iqList = document.getElementById('iqamah-settings-list');
-            iqList.innerHTML = '';
-            prayersData.forEach(p => {
-                iqList.innerHTML += `<div class="setting-row"><span>إقامة ${p.name}</span><input type="text" class="text-input" style="width:70px; text-align:center;" id="iq-${p.id}" value="${currentSettings.iqamah[p.id]}"></div>`;
-            });
-            
-            document.body.className = currentSettings.signageMode ? 'signage-mode' : '';
-            if(currentSettings.forcePortrait) document.body.classList.add('force-portrait');
-        }
-
-        async function fetchTimings() {
-            const city = currentSettings.city || 'Annaba';
-            const country = currentSettings.country || 'Algeria';
-            const url = `https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=3`;
-            
+        async function fetchData() {
             try {
-                const res = await fetch(url);
-                const d = await res.json();
-                if(d.code === 200) {
-                    pTimes = d.data.timings;
-                    const hijriStr = `${d.data.date.hijri.day} ${d.data.date.hijri.month.ar} ${d.data.date.hijri.year} هـ`;
-                    document.getElementById('hijri-date').innerText = hijriStr;
-                    document.getElementById('sig-hijri').innerText = hijriStr;
-                    document.getElementById('sig-greg').innerText = new Date().toLocaleDateString('en-GB');
-                    
-                    renderCards();
-                    fetchRealWeather(d.data.meta.latitude, d.data.meta.longitude);
-                    return d;
+                const response = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Annaba&country=Algeria&method=3');
+                const data = await response.json();
+                if(data.code === 200) {
+                    pTimes = data.data.timings;
+                    document.getElementById('hijri-date').innerText = data.data.date.hijri.day + " " + data.data.date.hijri.month.ar + " " + data.data.date.hijri.year + " هـ";
+                    renderPrayers();
                 }
-            } catch(e) {
-                console.error("Fetch Error:", e);
-                throw e;
+            } catch (error) {
+                console.error("خطأ في جلب البيانات", error);
+                document.getElementById('hijri-date').innerText = "خطأ في الاتصال بالإنترنت";
             }
         }
 
-        async function fetchRealWeather(lat, lon) {
-            try {
-                const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-                const weatherData = await weatherRes.json();
-                if (weatherData && weatherData.current_weather) {
-                    const temp = Math.round(weatherData.current_weather.temperature);
-                    const emoji = getWeatherEmoji(weatherData.current_weather.weathercode, weatherData.current_weather.is_day);
-                    const tempStr = `${temp}°C ${emoji}`;
-                    document.getElementById('w-temp').innerText = tempStr;
-                    if(document.getElementById('sig-temp')) document.getElementById('sig-temp').innerHTML = `${tempStr} <span id="sig-loc-name">${currentSettings.mosqueName}</span>`;
-                }
-            } catch(e) { console.error("Weather error", e); }
-        }
-
-        function getWeatherEmoji(code, isDay) {
-            if (code === 0) return isDay ? '☀️' : '🌙'; 
-            if (code === 1 || code === 2) return isDay ? '🌤️' : '☁️'; 
-            return '🌤️';
-        }
-
-        function renderCards() {
-            const phoneC = document.getElementById('prayer-list-phone');
-            const sigC = document.getElementById('prayer-list-sig');
-            if(!phoneC || !sigC) return;
-            phoneC.innerHTML = ''; sigC.innerHTML = '';
-            
+        function renderPrayers() {
+            const container = document.getElementById('prayer-list');
+            container.innerHTML = '';
             prayersData.forEach(p => {
-                const time = pTimes[p.id];
-                const iq = currentSettings.iqamah[p.id];
-                const iqText = iq.includes(':') ? `الإقامة ${iq}` : `بعد ${iq} دقيقة`;
-                
-                phoneC.innerHTML += `
+                container.innerHTML += `
                     <div class="prayer-card" id="card-${p.id}">
-                        <div class="iq-countdown" id="iqc-${p.id}">--:--</div>
-                        <div class="p-details">
-                            <span class="p-name">${p.name}</span>
-                            <span class="p-iqamah-text" id="iq-txt-${p.id}">${iqText}</span>
-                        </div>
-                        <div class="p-time">${time}</div>
-                    </div>`;
-                    
-                sigC.innerHTML += `
-                    <div class="sig-p-card" id="sig-${p.id}">
-                        <div class="iq-countdown" id="sig-iqc-${p.id}" style="top:-10px; background:gold; color:black;">--:--</div>
-                        <div class="sig-p-name">${p.name}</div>
-                        <div class="sig-p-time">${time}</div>
-                        <div class="sig-iqamah">${iqText}</div>
+                        <span>${p.name}</span>
+                        <span style="color:var(--accent-gold); font-weight:bold;">${pTimes[p.id]}</span>
                     </div>`;
             });
         }
 
-        function getAdjustedTime() {
-            return new Date(Date.now() + (currentSettings.clockOffset * 60000));
-        }
-
-        function coreLogic() {
-            const now = getAdjustedTime();
-            const timeStr = now.toLocaleTimeString('en-GB');
-            document.getElementById('liveClock').innerText = timeStr;
-            if(document.getElementById('sig-clock')) document.getElementById('sig-clock').innerText = timeStr.substring(0,5);
-
-            if(!pTimes.Fajr) return;
-
-            let minDiff = Infinity; let nextPrayer = null;
-
+        function checkActivePrayer(now) {
             prayersData.forEach(p => {
-                const cardPhone = document.getElementById(`card-${p.id}`);
-                const cardSig = document.getElementById(`sig-${p.id}`);
-                if(!cardPhone || !cardSig) return;
-
+                const card = document.getElementById(`card-${p.id}`);
+                if(!card) return;
                 const [h, m] = pTimes[p.id].split(':');
-                const pDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
-                
-                let iqDate;
-                const iqSetting = currentSettings.iqamah[p.id].toString();
-                if(iqSetting.includes(':')) {
-                    const [iqH, iqM] = iqSetting.split(':');
-                    iqDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), iqH, iqM, 0);
-                } else {
-                    iqDate = new Date(pDate.getTime() + (parseInt(iqSetting) * 60000));
+                const pDate = new Date(); pDate.setHours(h, m, 0);
+                if (now >= pDate) {
+                    card.style.opacity = "0.5";
+                    card.classList.remove('active');
                 }
-                
-                if (pDate < now && iqDate < now) {
-                    cardPhone.classList.add('passed'); cardPhone.classList.remove('active', 'waiting-iqamah');
-                    cardSig.classList.add('passed'); cardSig.classList.remove('active', 'waiting-iqamah');
-                    pDate.setDate(pDate.getDate() + 1);
-                } else if (pDate <= now && now <= iqDate) {
-                    cardPhone.classList.add('waiting-iqamah'); cardPhone.classList.remove('passed', 'active');
-                    cardSig.classList.add('waiting-iqamah'); cardSig.classList.remove('passed', 'active');
-                    
-                    const secLeft = Math.floor((iqDate - now) / 1000);
-                    const formatIq = `${String(Math.floor(secLeft/60)).padStart(2,'0')}:${String(secLeft%60).padStart(2,'0')}`;
-                    document.getElementById(`iqc-${p.id}`).innerText = formatIq;
-                    document.getElementById(`sig-iqc-${p.id}`).innerText = formatIq;
-                    
-                    if(soundsActivated && secLeft === 0 && !triggeredAlerts.has(p.id+"-0")) {
-                        document.getElementById('a-iqamah').play();
-                        triggeredAlerts.add(p.id+"-0");
-                        if(p.id === 'Fajr' || p.id === 'Maghrib') setTimeout(() => showAdhkar(p.id), 10000);
-                    }
-                } else {
-                    cardPhone.classList.remove('passed', 'active', 'waiting-iqamah');
-                    cardSig.classList.remove('passed', 'active', 'waiting-iqamah');
-                }
-
-                if ((pDate - now) > 0 && (pDate - now) < minDiff) { minDiff = pDate - now; nextPrayer = p; }
             });
-
-            if (nextPrayer) {
-                document.getElementById(`card-${nextPrayer.id}`).classList.add('active');
-                document.getElementById(`sig-${nextPrayer.id}`).classList.add('active');
-                const sec = Math.floor(minDiff / 1000);
-                const timerStr = `${String(Math.floor(sec/3600)).padStart(2,'0')}:${String(Math.floor((sec%3600)/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
-                document.getElementById('timer').innerText = timerStr;
-                document.getElementById('sig-timer').innerText = "الوقت لـ " + nextPrayer.name + ": " + timerStr;
-                
-                if (sec === 0 && soundsActivated && !triggeredAlerts.has(nextPrayer.id+"-adhan")) {
-                    document.getElementById('a-adhan').play();
-                    triggeredAlerts.add(nextPrayer.id+"-adhan");
-                }
-            }
         }
 
-        function saveAndCloseSettings() {
-            currentSettings.mosqueName = document.getElementById('set-mosque').value || 'مسجد';
-            currentSettings.city = document.getElementById('set-city').value || 'Annaba';
-            currentSettings.country = document.getElementById('set-country').value || 'Algeria';
-            currentSettings.signageMode = document.getElementById('set-signage').checked;
-            currentSettings.forcePortrait = document.getElementById('set-portrait').checked;
-            currentSettings.clockOffset = parseInt(document.getElementById('set-clock-offset').value) || 0;
-            
-            prayersData.forEach(p => {
-                currentSettings.iqamah[p.id] = document.getElementById(`iq-${p.id}`).value;
-            });
-            
-            localStorage.setItem('bouna_pro_v5', JSON.stringify(currentSettings));
-            document.getElementById('settings-modal').classList.remove('show');
-            loadSettings();
-            fetchTimings();
+        function setHadith() {
+            document.getElementById('hadith-text').innerText = dailyHadiths[new Date().getDay() % dailyHadiths.length];
         }
 
-        function activateSounds() {
-            document.getElementById('a-adhan').load();
-            document.getElementById('a-iqamah').load();
-            document.getElementById('p-btn').innerText = "✅ النظام الصوتي مفعل";
-            document.getElementById('p-btn').style.background = "#00695c";
-            document.getElementById('p-btn').style.color = "white";
-            soundsActivated = true;
-        }
-
-        function showAdhkar(type) {
-            const modal = document.getElementById('adhkar-box');
-            const title = document.getElementById('adhkar-title');
-            const text = document.getElementById('adhkar-text');
-            if(type === 'Fajr') {
-                title.innerText = "أذكار الصباح";
-                text.innerHTML = "أَصْبَحْنا وَأَصْبَحَ المُلْكُ لله وَالحَمدُ لله...";
-            } else {
-                title.innerText = "أذكار المساء";
-                text.innerHTML = "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ...";
-            }
-            modal.classList.add('show');
-        }
-
-        function closeAdhkar() { document.getElementById('adhkar-box').classList.remove('show'); }
-
-        function changeBackground() {
-            document.getElementById('dynamic-bg').style.backgroundImage = `url('${backgrounds[bgIndex]}')`;
-            bgIndex = (bgIndex + 1) % backgrounds.length;
-        }
+        // تشغيل التطبيق
+        init();
     </script>
 </body>
 </html>
